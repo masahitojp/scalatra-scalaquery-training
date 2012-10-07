@@ -12,11 +12,21 @@ import org.scalaquery.ql._
 import org.scalaquery.ql.TypeMapper._
 import org.scalaquery.ql.basic.BasicDriver.Implicit._
 import org.scalaquery.ql.basic.{BasicTable => Table}
+import com.jolbox.bonecp.BoneCPDataSource
 
 
 object Repositories {
 
-  val db = Database.forURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+  Class.forName("org.h2.Driver") 	// load the DB driver
+  protected val ds = new BoneCPDataSource()  // create a new datasource object
+  ds.setJdbcUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");		// set the JDBC url
+  ds.setUsername("sa")				// set the username
+  ds.setPassword("")				// set the password
+  ds.setMinConnectionsPerPartition(5)
+  ds.setMaxConnectionsPerPartition(10)
+  ds.setPartitionCount(1)
+
+  val db = Database.forDataSource(ds)
 
   // TODO
   def initDB:Boolean = {
@@ -24,6 +34,7 @@ object Repositories {
     try {
       db withSession {
         Beatles.ddl.create
+
         Beatles.insert(BeatlesMember(1, "John", "Lennon"))
         Beatles.insertAll(
           BeatlesMember(2, "Paul", "McCartney"),
@@ -41,9 +52,9 @@ object Repositories {
 }
 
 trait RepositorySupport {
-  def beatlesRepository = Repositories.beatlesRepository
+  protected def beatlesRepository = Repositories.beatlesRepository
 
-  def db = Repositories.db
+  protected def db = Repositories.db
 }
 
 
