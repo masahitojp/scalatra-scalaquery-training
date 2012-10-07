@@ -4,7 +4,10 @@ import org.scalatra._
 import scalate.ScalateSupport
 import com.github.masahitojp.data.{RepositorySupport, Beatles, BeatlesMember}
 
-class MyScalatraServlet extends ScalatraServlet with ScalateSupport with RepositorySupport {
+import net.liftweb.json._
+import org.scalatra.liftjson.LiftJsonSupport
+
+class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJsonSupport with RepositorySupport {
 
   get("/") {
     <html>
@@ -16,8 +19,9 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport with Reposit
   }
 
   get("/beatles"){
-
-    beatlesRepository.findAll
+    Extraction.decompose{
+      beatlesRepository.findAll
+    }
   }
 
   notFound {

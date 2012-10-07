@@ -1,16 +1,16 @@
 package com.github.masahitojp.app
 
-import org.scalatra.test.specs2._
+import org.scalatra.test.scalatest.ScalatraFunSuite
 
-// For more on Specs2, see http://etorreborre.github.com/specs2/guide/org.specs2.guide.QuickStart.html 
-class MyScalatraServletSpec extends ScalatraSpec { def is =
-  "GET / on MyScalatraServlet"                     ^
-    "should return status 200"                  ! root200^
-                                                end
-    
+
+class MyScalatraServletSpec extends ScalatraFunSuite {
+  // `MyScalatraServlet` is your app which extends ScalatraServlet
   addServlet(classOf[MyScalatraServlet], "/*")
 
-  def root200 = get("/") { 
-    status must_== 200
+  test("simple get") {
+    get("/") {
+      status should equal (200)
+      body should include ("world!")
+    }
   }
 }

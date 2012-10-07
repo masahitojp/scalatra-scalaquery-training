@@ -43,7 +43,6 @@ object Repositories {
 trait RepositorySupport {
   def beatlesRepository = Repositories.beatlesRepository
 
-  def initDB = Repositories.initDB
   def db = Repositories.db
 }
 
