@@ -6,8 +6,10 @@ import com.github.masahitojp.data.{RepositorySupport, Beatles, BeatlesMember}
 
 import net.liftweb.json._
 import org.scalatra.liftjson.LiftJsonSupport
+import swagger.SwaggerSupport
 
-class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJsonSupport with RepositorySupport {
+class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJsonSupport with RepositorySupport
+  {
 
   get("/") {
     <html>
@@ -18,9 +20,16 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJso
     </html>
   }
 
-  get("/beatles"){
+  get("/beatles/?"){
     Extraction.decompose{
       beatlesRepository.findAll
+    }
+  }
+
+  get("/beatles/:id"){
+    val id:Long = params("id").toLong
+    Extraction.decompose{
+      beatlesRepository.byId(id).getOrElse("")
     }
   }
 

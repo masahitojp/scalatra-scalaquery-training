@@ -63,6 +63,8 @@ class BeatlesRepository extends RepositorySupport {
   def findAll : Seq[BeatlesMember] = db withSession {
     (for (b <- Beatles) yield b.*).list
   }
-
+  def byId(id: Long) : Option[BeatlesMember] = db withSession {
+    Beatles.byId(id).firstOption
+  }
 }
 

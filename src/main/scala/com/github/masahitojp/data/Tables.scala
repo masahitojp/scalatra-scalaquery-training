@@ -18,4 +18,5 @@ object Beatles extends Table[BeatlesMember]("beatles") {
    def last_name = column[String]("last_name")
    def * = id~first_name~last_name <> (BeatlesMember, BeatlesMember.unapply _)
 
+   val byId = createFinderBy(_.id)
  }
