@@ -66,5 +66,12 @@ class BeatlesRepository extends RepositorySupport {
   def byId(id: Long) : Option[BeatlesMember] = db withSession {
     Beatles.byId(id).firstOption
   }
+
+  def update(member: BeatlesMember) = {
+    db withSession {
+      val q = for (b <- Beatles if b.id === member.id) yield b.first_name ~ b.last_name
+      q.update(member.firstName, member.lastName)
+    }
+  }
 }
 

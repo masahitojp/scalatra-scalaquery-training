@@ -6,4 +6,6 @@ package com.github.masahitojp.data
  * Date: 12/10/05
  * Time: 0:33
  */
-case class BeatlesMember(id: Long, firstName: String, lastName: String)
+case class Member()
+case class BeatlesMemberNoId(firstName: String, lastName: String) extends Member
+case class BeatlesMember(id: Long, firstName: String, lastName: String) extends Member

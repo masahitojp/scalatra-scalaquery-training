@@ -2,7 +2,7 @@ package com.github.masahitojp.app
 
 import org.scalatra._
 import scalate.ScalateSupport
-import com.github.masahitojp.data.{RepositorySupport, Beatles, BeatlesMember}
+import com.github.masahitojp.data.{BeatlesMemberNoId, RepositorySupport, Beatles, BeatlesMember}
 
 import net.liftweb.json._
 import org.scalatra.liftjson.LiftJsonSupport
@@ -31,6 +31,24 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJso
     Extraction.decompose{
       beatlesRepository.byId(id).getOrElse("")
     }
+  }
+
+  put("/beatles/:id"){
+    val id:Long = params("id").toLong
+    parsedBody match {
+      case JNothing ⇒ halt(400, "invalid json")
+      case json: JObject ⇒ {
+
+        val member: BeatlesMemberNoId = json.extract[BeatlesMemberNoId]
+        beatlesRepository.update(BeatlesMember(id, member.firstName, member.lastName))
+      }
+      case _ ⇒ halt(400, "unknown json")
+    }
+
+  }
+
+  delete("/beatles/:id"){
+
   }
 
   notFound {
