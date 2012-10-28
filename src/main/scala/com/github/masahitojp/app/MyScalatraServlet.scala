@@ -2,19 +2,22 @@ package com.github.masahitojp.app
 
 import org.scalatra._
 import scalate.ScalateSupport
-import com.github.masahitojp.data.{BeatlesMemberNoId, RepositorySupport, Beatles, BeatlesMember}
+import com.github.masahitojp.data.{BeatlesMemberNoId, RepositorySupport, BeatlesMember}
 
 import net.liftweb.json._
 import org.scalatra.liftjson.LiftJsonSupport
-import swagger.SwaggerSupport
+import grizzled.slf4j.Logger
+import vo.VoResponse
 
 class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJsonSupport with RepositorySupport
   {
 
+  val logger = Logger(classOf[MyScalatraServlet])
+
   get("/") {
     <html>
       <body>
-        <h1>Hello, world!</h1>
+        <h1>Hello, world!!!?</h1>
         Say <a href="hello-scalate">hello to Scalate</a>.
       </body>
     </html>
@@ -34,13 +37,14 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJso
   }
 
   put("/beatles/:id"){
-    val id:Long = params("id").toLong
+    val id:Long = (params.get("id") getOrElse "0").toLong
     parsedBody match {
-      case JNothing ⇒ halt(400, "invalid json")
+      case JNothing ⇒ halt(401, "invalid json")
       case json: JObject ⇒ {
 
         val member: BeatlesMemberNoId = json.extract[BeatlesMemberNoId]
-        beatlesRepository.update(BeatlesMember(id, member.firstName, member.lastName))
+        val result = beatlesRepository.update(BeatlesMember(id, member.firstName, member.lastName))
+        Extraction.decompose(VoResponse("ok", result))
       }
       case _ ⇒ halt(400, "unknown json")
     }
@@ -48,7 +52,9 @@ class MyScalatraServlet extends ScalatraServlet with ScalateSupport with LiftJso
   }
 
   delete("/beatles/:id"){
-
+    val id:Long = (params.get("id") getOrElse "0").toLong
+    val result = beatlesRepository.delete(id)
+    Extraction.decompose(VoResponse("ok", result))
   }
 
   notFound {

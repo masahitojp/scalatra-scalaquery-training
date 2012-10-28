@@ -13,6 +13,7 @@ import org.scalaquery.ql.TypeMapper._
 import org.scalaquery.ql.basic.BasicDriver.Implicit._
 import org.scalaquery.ql.basic.{BasicTable => Table}
 import com.jolbox.bonecp.BoneCPDataSource
+import org.scalaquery.ql.ColumnOps.CountAll
 
 
 object Repositories {
@@ -35,11 +36,16 @@ object Repositories {
       db withSession {
         Beatles.ddl.create
 
-        Beatles.insert(BeatlesMember(1, "John", "Lennon"))
-        Beatles.insertAll(
-          BeatlesMember(2, "Paul", "McCartney"),
-          BeatlesMember(3, "George", "Harrison"),
-          BeatlesMember(4, "Peter", "Best"))
+        val countQuery = Beatles map CountAll
+        val count = countQuery.first
+
+        if(count < 1){
+          Beatles.insert(BeatlesMember(1, "John", "Lennon"))
+          Beatles.insertAll(
+            BeatlesMember(2, "Paul", "McCartney"),
+            BeatlesMember(3, "George", "Harrison"),
+            BeatlesMember(4, "Peter", "Best"))
+        }
       }
       rtn = true
     } catch {
@@ -68,10 +74,20 @@ class BeatlesRepository extends RepositorySupport {
   }
 
   def update(member: BeatlesMember) = {
+    var result = false
     db withSession {
       val q = for (b <- Beatles if b.id === member.id) yield b.first_name ~ b.last_name
-      q.update(member.firstName, member.lastName)
+      result = (q.update(member.firstName, member.lastName) > 0 )
     }
+    result
+  }
+
+  def delete(id: Long) = {
+    var result = false
+    db withSession{
+      result = (Beatles.where(_.id === id).delete > 0)
+    }
+    result
   }
 }
 
